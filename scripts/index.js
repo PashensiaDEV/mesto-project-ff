@@ -19,6 +19,7 @@ function createCard(card, removeCard) {
 function removeCard(button) {
   button.addEventListener('click', function () {
     const listItem = button.closest('.places__item'); // Ищем родителя кнопки
+    console.log(listItem)
     if (listItem) {  // Если элемент есть то он будет удален
       listItem.remove();
     }

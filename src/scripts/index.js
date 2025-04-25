@@ -1,40 +1,57 @@
 // @todo: Темплейт карточки
+import { initialCards } from './cards.js';
+import { removeCard } from './cards.js';
+import { createCard } from './cards.js';
+import { addCards } from './cards.js';
+import { openPopup } from './modal.js';
+import { OpenImgPopUp } from './modal.js'
+import { formElement } from './modal.js';
+import { handleFormSubmit } from './modal.js';
+import { handleAddImage } from './modal.js';
+import { ImageModule } from './modal.js';
+import { likeCard } from './cards.js';
+
 import '../pages/index.css';
 
-const templatePush = document.querySelector('.places__list');
+const popupButtons = document.querySelectorAll('[data-popup]');
+const listCards = document.querySelector('.places__list');
 
-
-function createCard(card, removeCard) {
-  const template = document.querySelector('#card-template').content;
-  const templateContent = template.querySelector('.places__item').cloneNode(true); // Дублируем темплейт
-
-  templateContent.querySelector('.card__image').src = card.link;
-  templateContent.querySelector('.card__image').alt = card.name;
-  templateContent.querySelector('.card__title').textContent = card.name;
-
-  const remButton = templateContent.querySelector('.card__delete-button'); // Записываем кнопку в переменную
-  removeCard(remButton); // Кол бек функции 
-
-  return templateContent; // Возвращаем один готовый элемент
-}
-
-function removeCard(button) {
-  button.addEventListener('click', function () {
-    const listItem = button.closest('.places__item'); // Ищем родителя кнопки
-    console.log(listItem)
-    if (listItem) {  // Если элемент есть то он будет удален
-      listItem.remove();
-    }
-  });
-}
-
-function addCards(cardItem) {
-    templatePush.append(cardItem);// Добавляем жлемент в разметку 
-}
 
 initialCards.forEach((card) => {
-  addCards(createCard(card, removeCard)) // Ревьювер годно сделал нравиться)
-})
+  addCards(createCard(card, removeCard)) // Ревьювер годно сделал нравиться
+});
+
+popupButtons.forEach(button => {  //Открытие попапа редактирования и добавление новой фото по слушателю
+  button.addEventListener('click', () => {
+    const popupSelector = button.getAttribute('data-popup');
+    openPopup(popupSelector);
+  });
+});
+
+listCards.addEventListener('click',(event) => { //Здесь мы по делегированию события понимаем куда кликает пользователь
+  const target = event.target;                  //И перезаписмуем данные изображения в константы и передаем в функцию
+  if (target.classList.contains('card__image')) {
+    const fullSrc = target.src;
+    const caption = target.alt;
+    OpenImgPopUp(fullSrc, caption);
+}});
+
+formElement.addEventListener('submit', handleFormSubmit); 
+
+ImageModule.addEventListener('submit', handleAddImage);
+
+document.querySelectorAll('.card__like-button').forEach(button => {button.addEventListener('click', likeCard)})
+
+
+
+
+// popupImgButtons.forEach(img => {
+//   img.addEventListener('click', () => {
+//     const fullSrc = img.src;
+//     const caption = img.alt;
+//     OpenImgPopUp(fullSrc, caption);
+//   });
+// })
 
 
 
@@ -52,4 +69,4 @@ initialCards.forEach((card) => {
 
 // @todo: Функция удаления карточки
 
-// @todo: Вывести карточки на страницу
+// @todo: Вывести карточки на страниц

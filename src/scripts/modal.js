@@ -1,5 +1,3 @@
-import { createCard, addCards, removeCard } from "./cards";
-
 const ImgPopUpBlock = document.querySelector('.popup_type_image');
 const PopUpImage =  ImgPopUpBlock.querySelector('.popup__image');
 const ImageCaption = ImgPopUpBlock.querySelector('.popup__caption');
@@ -70,22 +68,4 @@ export function handleFormSubmit(evt) {
     document.querySelector('.profile__title').textContent = nameInput.value;
     document.querySelector('.profile__description').textContent = jobInput.value;
     formElement.classList.remove('popup_is-opened');
-}
-
-export function handleAddImage (evt) {
-  evt.preventDefault(); 
-
-  const newCard = {
-    name: ImageModule.querySelector('.popup__input_type_card-name').value,
-    link: ImageModule.querySelector('.popup__input_type_url').value
-  };
-
-  const cardElement = createCard(newCard, removeCard);
-
-  addCards(cardElement);
-
-  ImageModule.classList.remove('popup_is-opened');
-  ImageModule.querySelector('.popup__input_type_url').value = '';
-  ImageModule.querySelector('.popup__input_type_card-name').value = '';
-  
 }

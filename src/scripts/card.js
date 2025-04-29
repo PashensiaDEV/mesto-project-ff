@@ -1,13 +1,17 @@
-export function createCard(card, removeCard,onLikeCard) {
+export function createCard(card, removeCard, onLikeCard) {
   const template = document.querySelector('#card-template').content;
   const templateContent = template.querySelector('.places__item').cloneNode(true); // Дублируем темплейт
+  const TemplateData = templateContent.querySelector('.card__image');
 
-  templateContent.querySelector('.card__image').src = card.link;
-  templateContent.querySelector('.card__image').alt = card.name;
+  TemplateData.src = card.link;
+  TemplateData.alt = card.name;
   templateContent.querySelector('.card__title').textContent = card.name;
 
   const remButton = templateContent.querySelector('.card__delete-button'); // Записываем кнопку в переменную
+  const likeButton = templateContent.querySelector('.card__like-button');
   removeCard(remButton); // Кол бек функции 
+
+  onLikeCard(likeButton);
 
   return templateContent; // Возвращаем один готовый элемент
 }
@@ -22,8 +26,8 @@ export function removeCard(button) {
   });
 }
 
-
-
 export function onLikeCard(element) {
-  element.target.classList.toggle('card__like-button_is-active');
+  element.addEventListener('click', () => {
+    element.classList.toggle('card__like-button_is-active');
+  })
 }

@@ -16,11 +16,3 @@ function closeEscPopup(e) {
     closePopup(openedModuleWindow);
   }
 }
-
-document.querySelectorAll('.popup').forEach((modal) => {
-  modal.addEventListener('click', (event) => {
-    if(event.target.classList.contains('popup__close')|| event.target.classList.contains('popup')) { 
-      closePopup(modal);
-    }
-  })
-})

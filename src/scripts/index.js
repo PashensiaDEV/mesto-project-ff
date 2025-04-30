@@ -1,34 +1,39 @@
-// @todo: Темплейт карточки
+
 import '../pages/index.css';
 
 import { initialCards } from './cards.js';
 import { removeCard } from './card.js';
 import { createCard } from './card.js';
 import { openPopUp, closePopup } from './modal.js';
-import { onLikeCard } from './card.js';
+import { LikeCard } from './card.js';
+
+export const template = document.querySelector('#card-template').content;
 
 const templatePush = document.querySelector('.places__list');
 
-const imgPopUpBlock = document.querySelector('.popup_type_image');
-const popUpImage =  imgPopUpBlock.querySelector('.popup__image');
-const imageCaption = imgPopUpBlock.querySelector('.popup__caption');
-const formElement = document.querySelector('.popup_type_edit') ;
-const imageModule =document.querySelector('.popup_type_new-card');
-const imagePopUpWin = document.querySelector('.popup_type_image');
-const buttonOpenFormNewCard = document.querySelector('.profile__add-button');
-const nameInput = formElement.querySelector('.popup__input_type_name');
-const jobInput = formElement.querySelector('.popup__input_type_description');
+const popupFullImage = document.querySelector('.popup_type_image');
+const popupImage =  popupFullImage.querySelector('.popup__image');
+const popupImageCaption = popupFullImage.querySelector('.popup__caption');
+const popupEditProfile = document.querySelector('.popup_type_edit') ;
+const popupAddNewCard =document.querySelector('.popup_type_new-card');
+const formAddNewCard = popupAddNewCard.querySelector('form[name="new-place"]')
+const formEditProfile =  popupEditProfile.querySelector('form[name="edit-profile"]')
+const nameInput = popupEditProfile.querySelector('.popup__input_type_name');
+const descriptionInput = popupEditProfile.querySelector('.popup__input_type_description');
+
+
 const buttonOpenFormProfile = document.querySelector('.profile__edit-button');
+const buttonOpenFormNewCard = document.querySelector('.profile__add-button');
 
 const titleProfile = document.querySelector('.profile__title');
 const descriptionProfile = document.querySelector('.profile__description');
 
-const titleNewCard= imageModule.querySelector('.popup__input_type_card-name');
-const urlNewCard = imageModule.querySelector('.popup__input_type_url');
+const inputNameFormNewCard = popupAddNewCard.querySelector('.popup__input_type_card-name');
+const inputLinkFormNewCard = popupAddNewCard.querySelector('.popup__input_type_url');
 
 const newCard = {
-  name: titleNewCard.value,
-  link: urlNewCard.value
+  name: inputNameFormNewCard.value,
+  link: inputLinkFormNewCard.value
 };
 
 
@@ -39,90 +44,70 @@ function addCards(cardItem) {
 function handleAddNewImage(evt) { //Функция ручного добавления новой карточки
   evt.preventDefault();
   
-  newCard.name = titleNewCard.value,
-  newCard.link = urlNewCard.value
+  newCard.name = inputNameFormNewCard.value,
+  newCard.link = inputLinkFormNewCard.value
 
-  const cardElement = createCard(newCard, removeCard , onLikeCard);
+  const cardElement = createCard(newCard, removeCard , LikeCard, openPopupImage);
 
   addCards(cardElement);
 
-  imageModule.classList.remove('popup_is-opened');
-  imageModule.reset();
-  
+  closePopup(popupAddNewCard);
+  formAddNewCard.reset();
 }
 
 function handleSubmitProfileForm (evt) {   //Функция изменения данных профиля 
   evt.preventDefault();
   titleProfile.textContent = nameInput.value;
-  descriptionProfile.textContent = jobInput.value;
-  closePopup(formElement);
+  descriptionProfile.textContent = descriptionInput.value;
+  closePopup(popupEditProfile);
 }
 
 function openPopupProfile () {  //Функция открытия попапа редактирования профиля
-  jobInput.value = descriptionProfile.textContent;
+  descriptionInput.value = descriptionProfile.textContent;
   nameInput.value = titleProfile.textContent;
-  openPopUp(formElement);
+  openPopUp(popupEditProfile);
 }
 
 function openPopupAddImage() { // Функция открытия попапа добьавления новой фотографии
-  openPopUp(imageModule);
+  openPopUp(popupAddNewCard);
 }
 
 function openPopupImage(card) {  //Функция открытия попапа карточек
-  popUpImage.src = card.link;
-  imageCaption.textContent = card.name;
-  openPopUp(imagePopUpWin);
+  popupImage.src = card.link;
+  popupImage.alt = card.name;
+  popupImageCaption.textContent = card.name;
+  openPopUp(popupFullImage);
 }
 
 initialCards.forEach((card) => {
-  addCards(createCard(card, removeCard , onLikeCard)) // Добавляем все карточки из исходной колекции в разметку
+  addCards(createCard(card, removeCard , LikeCard, openPopupImage)) // Добавляем все карточки из исходной колекции в разметку
 });
 
 buttonOpenFormProfile.addEventListener('click', openPopupProfile); //Слушатель на открытие формы редактирования профиля
 buttonOpenFormNewCard.addEventListener('click', openPopupAddImage); //Слушатель на открытие формы добавления карточки
-templatePush.addEventListener('click',(event) => { //Здесь мы по делегированию события понимаем куда кликает пользователь
-  const target = event.target;                  //И перезаписмуем данные изображения в константы и передаем в функцию
-  if (target.classList.contains('card__image')) {
-    newCard.link = target.src;
-    newCard.name = target.alt;
-    openPopupImage(newCard);  
-}});
 
 
 
-imageModule.addEventListener('submit', handleAddNewImage);
-formElement.addEventListener('submit', handleSubmitProfileForm);
+// templatePush.addEventListener('click',(event) => { //Здесь мы по делегированию события понимаем куда кликает пользователь
+//   const target = event.target;                  //И перезаписмуем данные изображения в константы и передаем в функцию
+//   if (target.classList.contains('card__image')) {
+//     newCard.link = target.src;
+//     newCard.name = target.alt;
+//     openPopupImage(newCard);  
+// }});
+
+document.querySelectorAll('.popup').forEach((modal) => {  //
+  modal.addEventListener('click', (event) => {
+    if(event.target.classList.contains('popup__close')|| event.target.classList.contains('popup')) { 
+      closePopup(modal);
+    }
+  })
+})
 
 
 
+formAddNewCard.addEventListener('submit', handleAddNewImage); // Слушатель сабмита у формы добавления новой карточки 
+formEditProfile.addEventListener('submit', handleSubmitProfileForm); //СЛушатель сабмита у формы изменения профиля
 
-// document.querySelectorAll('.card__like-button').forEach(button => {button.addEventListener('click', onLikeCard)})
+//Спасибо большое за все советы я правда начал понимать почему лучше передавать функцию коллбэк)) Очень полезные советы 
 
-
-
-
-// popupImgButtons.forEach(img => {
-//   img.addEventListener('click', () => {
-//     const fullSrc = img.src;
-//     const caption = img.alt;
-//     OpenImgPopUp(fullSrc, caption);
-//   });
-// })
-
-
-
-
-
-
-
-
-
-
-
-// @todo: DOM узлы
-
-// @todo: Функция создания карточки
-
-// @todo: Функция удаления карточки
-
-// @todo: Вывести карточки на страниц

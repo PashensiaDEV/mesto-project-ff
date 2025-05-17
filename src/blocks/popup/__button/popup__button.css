@@ -12,11 +12,18 @@
   border: none;
   transition: visibility 0s, background 0.3s;
   margin-top: 48px;
+<<<<<<< HEAD
+=======
+  cursor: pointer;
+>>>>>>> gh-pages
 }
 
 .popup__button:hover {
   background: rgba(0, 0, 0, 0.8);
+<<<<<<< HEAD
   cursor: pointer;
+=======
+>>>>>>> gh-pages
 }
 
 @media screen and (max-width: 568px) {
@@ -25,3 +32,13 @@
     line-height: 17px;
   }
 }
+<<<<<<< HEAD
+=======
+
+.button_inactive {
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.2);
+  cursor: default;
+}
+>>>>>>> gh-pages

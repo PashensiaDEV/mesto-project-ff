@@ -7,6 +7,8 @@ export function createCard(card, removeCard, LikeCard, onopenPopupImage) {
   templateData.src = card.link;
   templateData.alt = card.name;
   templateContent.querySelector('.card__title').textContent = card.name;
+  templateContent.querySelector('.like-counter').textContent = card.likes.length;
+
 
   templateData.addEventListener('click', () => {
     onopenPopupImage(card);

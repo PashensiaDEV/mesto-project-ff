@@ -18,8 +18,7 @@
 .card__like-button:hover {
   opacity: 0.6;
 }
-<<<<<<< HEAD
-=======
+
 
 .card__description-ineractive {
   display: flex;
@@ -31,4 +30,3 @@
 .like-counter {
   font-size: 13px;
 }
->>>>>>> gh-pages

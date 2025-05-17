@@ -2,9 +2,6 @@
 import '../pages/index.css';
 
 
-import { initialCards } from './cards.js';
-
-
 import { removeCard } from './card.js';
 import { createCard } from './card.js';
 import { openPopUp, closePopup } from './modal.js';
@@ -55,12 +52,6 @@ const inputNameFormNewCard = popupAddNewCard.querySelector('.popup__input_type_c
 const inputLinkFormNewCard = popupAddNewCard.querySelector('.popup__input_type_url');
 
 
-const newCard = {
-  name: inputNameFormNewCard.value,
-  link: inputLinkFormNewCard.value
-};
-
-
 function addCards(cardItem) {
   templatePush.prepend(cardItem);// Добавляем элемент в разметку 
 }
@@ -69,15 +60,10 @@ function addCards(cardItem) {
 //   link: inputLinkFormNewCard.value
 // };
 
-
-function addCards(cardItem) {
-  templatePush.append(cardItem);// Добавляем элемент в разметку 
-
-}
-
 function handleAddNewImage(evt) { //Функция ручного добавления новой карточки
   evt.preventDefault();
-
+  const newCard = {
+ };
   
   newCard.name = inputNameFormNewCard.value,
   newCard.link = inputLinkFormNewCard.value
@@ -139,10 +125,6 @@ function openPopupImage(card) {  //Функция открытия попапа 
   popupImageCaption.textContent = card.name;
   openPopUp(popupFullImage);
 }
-
-initialCards.forEach((card) => {
-  addCards(createCard(card, removeCard , LikeCard, openPopupImage)) // Добавляем все карточки из исходной колекции в разметку
-});
 
 
 

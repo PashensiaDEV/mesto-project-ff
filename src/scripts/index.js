@@ -7,6 +7,12 @@ import { createCard } from './card.js';
 import { openPopUp, closePopup } from './modal.js';
 import { LikeCard } from './card.js';
 
+import {getCustomerInfo} from './api.js';
+import {upLoadProfileInfo} from './api.js';
+import {upLoadNewCard} from './api.js';
+import {cardsLoad} from './api.js';
+import {cardsDelete} from './api.js';
+
 import { clearValidation } from './validation.js';
 import { enableValidation } from './validation.js';
 
@@ -20,8 +26,8 @@ export const validationConfig = {
   errorClassDissable: '.form__input-error'
 };
 
-const API = 'https://nomoreparties.co/v1/'
-const authorizationKey = '4601d008-a405-4f80-81df-1bf2249ca44f';
+export const API = 'https://nomoreparties.co/v1/'
+export const authorizationKey = '4601d008-a405-4f80-81df-1bf2249ca44f';
 
 
 export const template = document.querySelector('#card-template').content;
@@ -38,22 +44,24 @@ const formEditProfile =  popupEditProfile.querySelector('form[name="edit-profile
 const nameInput = popupEditProfile.querySelector('.popup__input_type_name');
 const descriptionInput = popupEditProfile.querySelector('.popup__input_type_description');
 
+const deleteButtonCard = template.querySelectorAll('.card__delete-button');
+const popupDeleteCard = document.querySelector('.popup_type_delete');
 
 const buttonOpenFormProfile = document.querySelector('.profile__edit-button');
 const buttonOpenFormNewCard = document.querySelector('.profile__add-button');
 
-const titleProfile = document.querySelector('.profile__title');
-const descriptionProfile = document.querySelector('.profile__description');
+export const titleProfile = document.querySelector('.profile__title');
+export const descriptionProfile = document.querySelector('.profile__description');
 
-const imageProfile = document.querySelector('.profile__image');
+export const imageProfile = document.querySelector('.profile__image');
 
 
 const inputNameFormNewCard = popupAddNewCard.querySelector('.popup__input_type_card-name');
 const inputLinkFormNewCard = popupAddNewCard.querySelector('.popup__input_type_url');
 
 
-function addCards(cardItem) {
-  templatePush.prepend(cardItem);// Добавляем элемент в разметку 
+export function addCards(cardItem) {
+  templatePush.append(cardItem);// Добавляем элемент в разметку 
 }
 // const newCard = {
 //   name: inputNameFormNewCard.value,
@@ -62,25 +70,17 @@ function addCards(cardItem) {
 
 function handleAddNewImage(evt) { //Функция ручного добавления новой карточки
   evt.preventDefault();
-  const newCard = {
- };
-  
-  newCard.name = inputNameFormNewCard.value,
-  newCard.link = inputLinkFormNewCard.value
-
-  const cardElement = createCard(newCard, removeCard , LikeCard, openPopupImage);
-
-  addCards(cardElement);
-
-  closePopup(popupAddNewCard);
-  formAddNewCard.reset();
 
   upLoadNewCard(inputNameFormNewCard.value, inputLinkFormNewCard.value)
   .then((result) => {
     const newCard = {
       name: result.name,
       link: result.link,
-      likes: result.likes
+      likes: result.likes,
+      _id: result._id,
+      owner: {
+        _id: result.owner._id
+      }
     }
     console.log(result)
     const cardElement = createCard(newCard, removeCard , LikeCard, openPopupImage);
@@ -149,6 +149,14 @@ document.querySelectorAll('.popup').forEach((modal) => {  //
   })
 })
 
+function openDelteCardPopUp() {
+  openPopUp(popupDeleteCard);
+}
+
+
+deleteButtonCard.forEach((button)=> {
+  button.addEventListener('click',openDelteCardPopUp)
+})
 
 
 formAddNewCard.addEventListener('submit', handleAddNewImage); // Слушатель сабмита у формы добавления новой карточки 
@@ -167,74 +175,11 @@ enableValidation(validationConfig);
 //_______________________________________________________________________________
 // API
 
-function getCustomerInfo() {
-  fetch(`${API}wff-cohort-38/users/me`, {
-    method: 'GET',
-    headers: {
-    authorization: authorizationKey
-  }
-  })
-  .then((res)=> {
-    return res.json()
-  })
-  .then((result) => {
-    titleProfile.textContent = result.name;
-    descriptionProfile.textContent = result.about;
-    imageProfile.style.backgroundImage = `url(${result.avatar})`;
-  })}
-
-
 getCustomerInfo();
 
-function upLoadProfileInfo(nameValue, aboutValue) {
-  return fetch(`${API}wff-cohort-38/users/me`, {
-  method: 'PATCH',
-  headers: {
-    authorization: authorizationKey,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name: nameValue,
-    about: aboutValue
-  })
-})
-.then((res)=> {
-    return res.json();
-  })
-}
-
-function upLoadNewCard(nameValue, urlValue) {
-  return fetch(`${API}wff-cohort-38/cards`, {
-  method: 'POST',
-  headers: {
-    authorization: authorizationKey,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name: nameValue,
-    link: urlValue
-  })
-})
-.then((res)=> {
-    return res.json();
-  })
-}
-
-function cardsLoad() {
-  fetch (`${API}wff-cohort-38/cards`, {
-     method: 'GET',
-    headers: {
-    authorization: authorizationKey
-    }
-  })
-  .then ((res) => {
-   return res.json();
-  })
-  .then ((result) => {
+cardsLoad()
+.then ((result) => {
     result.forEach((card) => {
   addCards(createCard(card, removeCard , LikeCard, openPopupImage)) // Добавляем все карточки из исходной колекции в разметку
 });
-  })
-}
-
-cardsLoad();
+  });

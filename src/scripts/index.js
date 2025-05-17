@@ -214,8 +214,6 @@ function cardsLoad() {
   })
 }
 
-
-
 cardsLoad()
 
 

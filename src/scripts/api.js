@@ -13,8 +13,10 @@ export function getCustomerInfo() {
     authorization: authorizationKey
   }
   })
-  .then((res)=> {
-    return res.json()
+  .then((res) => {
+    if (res.ok){
+    return res.json();
+    } return Promise.reject(`Ошибка: ${res.status}`);
   })
   .then((result) => {
     titleProfile.textContent = result.name;
@@ -34,9 +36,11 @@ export function upLoadProfileInfo(nameValue, aboutValue) {
     about: aboutValue
   })
 })
-.then((res)=> {
-    return res.json();
-  })
+.then((res) => {
+  if (res.ok){
+  return res.json();
+  } return Promise.reject(`Ошибка: ${res.status}`);
+})
 }
 
 export function upLoadNewCard(nameValue, urlValue) {
@@ -51,9 +55,11 @@ export function upLoadNewCard(nameValue, urlValue) {
     link: urlValue
   })
 })
-.then((res)=> {
-    return res.json();
-  })
+.then((res) => {
+  if (res.ok){
+  return res.json();
+  } return Promise.reject(`Ошибка: ${res.status}`);
+})
 }
 
 export function cardsLoad() {
@@ -63,8 +69,10 @@ export function cardsLoad() {
     authorization: authorizationKey
     }
   })
-  .then ((res) => {
-   return res.json();
+  .then((res) => {
+    if (res.ok){
+    return res.json();
+    } return Promise.reject(`Ошибка: ${res.status}`);
   });
 }
 
@@ -74,5 +82,51 @@ export function cardDelete(cardId) {
     headers: {
     authorization: authorizationKey
     }
+  })
+}
+
+export function likeCard(cardId) {
+  return fetch (`${API}wff-cohort-38/cards/likes/${cardId}`, {
+    method: 'PUT',
+    headers: {
+    authorization: authorizationKey
+    }
+  })
+  .then((res) => {
+    if (res.ok){
+    return res.json();
+    } return Promise.reject(`Ошибка: ${res.status}`);
+  })
+}
+
+export function unLikeCard(cardId) {
+  return fetch (`${API}wff-cohort-38/cards/likes/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+    authorization: authorizationKey
+    }
+  })
+  .then((res) => {
+    if (res.ok){
+    return res.json();
+    } return Promise.reject(`Ошибка: ${res.status}`);
+  })
+}
+
+export function upLoadNewAvatar(tempUrl) {
+  return fetch(`${API}wff-cohort-38/users/me/avatar`, {
+    method: 'PATCH',
+    headers: {
+      authorization: authorizationKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      avatar: tempUrl
+    })
+  })
+  .then((res) => {
+    if (res.ok){
+    return res.json();
+    } return Promise.reject(`Ошибка: ${res.status}`);
   })
 }

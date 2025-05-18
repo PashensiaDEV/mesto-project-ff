@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -24,7 +24,7 @@
           <div
             class="profile__image"
             style="background-image: url(<%=require('./images/pasha.jpg')%>)"
-          ></div>
+          > <div class="profile__overlay"></div></div>
 
           <div class="profile__info">
             <h1 class="profile__title">Pashensia</h1>
@@ -88,12 +88,34 @@
         </div>
       </div>
 
+      <div class="popup popup_type_edit-avatar popup_is-animated">
+        <div class="popup__content">
+          <button type="button" class="popup__close"></button>
+          <h3 class="popup__title">Обновить аватар</h3>
+
+          <form class="popup__form" name="edit-profile" novalidate>
+            <input
+            type="url"
+            name="link"
+            class="popup__input popup__input_type_url"
+            id="url-input"
+            placeholder="Ссылка на картинку"
+            required
+          />
+            <span class="form__input-error url-input-error"></span>
+            <button type="submit" class="button popup__button">
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+
       
       <div class="popup popup_type_delete popup_is-animated">
         <div class="popup__content">
           <button type="button" class="popup__close"></button>
           <h3 class="popup__title">Вы уверены?</h3>
-          <button type="submit" class="button popup__button">
+          <button type="button" class="button popup__button popup_button-delete">
               Да
           </button>
         </div>

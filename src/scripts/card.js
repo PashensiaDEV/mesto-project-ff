@@ -3,12 +3,12 @@ import {template} from './index.js';
 export function createCard(card, removeCard, LikeCard, onopenPopupImage) {
   const templateContent = template.querySelector('.places__item').cloneNode(true); // Дублируем темплейт
   const templateData = templateContent.querySelector('.card__image');
+  const likeCounter = templateContent.querySelector('.like-counter');
 
   templateData.src = card.link;
   templateData.alt = card.name;
+  likeCounter.textContent = card.likes.length;
   templateContent.querySelector('.card__title').textContent = card.name;
-  templateContent.querySelector('.like-counter').textContent = card.likes.length;
-  console.log(card)
 
 
   templateData.addEventListener('click', () => {
@@ -25,26 +25,20 @@ export function createCard(card, removeCard, LikeCard, onopenPopupImage) {
       remButton.classList.add('card__delete-button-innactive');
   }
  // Кол бек функции 
+  if (card.likes.some(user => user._id === '119a34ebdcc16fb8071c44da')) {
+     likeButton.classList.add('card__like-button_is-active');
+  }
 
-  LikeCard(likeButton);
+
+  LikeCard(likeButton, card, likeCounter);
 
   return templateContent; // Возвращаем один готовый элемент
 }
 
-export function removeCard(button, card) {
-  button.addEventListener('click', function () {
-    const listItem = button.closest('.places__item');
-    // cardDelete(card._id)
-    // .then(() => {
-      if (listItem) {  // Если элемент есть то он будет удален
-      listItem.remove();
-    }
-  // });
- });
+export function removeCardFromHtml(Item) {
+  Item.remove();
 }
 
-export function LikeCard(element) {
-  element.addEventListener('click', () => {
-    element.classList.toggle('card__like-button_is-active');
-  })
+export function likeCardChanger(button) {
+  button.classList.toggle('card__like-button_is-active');
 }

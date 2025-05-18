@@ -1,31 +1,29 @@
-import {API} from './index.js';
-import {authorizationKey} from './index.js'
-import {imageProfile} from './index.js'
-import {descriptionProfile} from './index.js'
-import {titleProfile} from './index.js'
 
+
+const API_URL = "https://nomoreparties.co/v1/wff-cohort-38/";
+const authorizationKey = "4601d008-a405-4f80-81df-1bf2249ca44f";
+
+
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
+}
 
 
 export function getCustomerInfo() {
-  fetch(`${API}wff-cohort-38/users/me`, {
+  return fetch(`${API_URL}users/me`, {
     method: 'GET',
     headers: {
     authorization: authorizationKey
   }
   })
-  .then((res) => {
-    if (res.ok){
-    return res.json();
-    } return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .then((result) => {
-    titleProfile.textContent = result.name;
-    descriptionProfile.textContent = result.about;
-    imageProfile.style.backgroundImage = `url(${result.avatar})`;
-  })}
+  .then(handleResponse)
+}
 
 export function upLoadProfileInfo(nameValue, aboutValue) {
-  return fetch(`${API}wff-cohort-38/users/me`, {
+  return fetch(`${API_URL}users/me`, {
   method: 'PATCH',
   headers: {
     authorization: authorizationKey,
@@ -36,15 +34,11 @@ export function upLoadProfileInfo(nameValue, aboutValue) {
     about: aboutValue
   })
 })
-.then((res) => {
-  if (res.ok){
-  return res.json();
-  } return Promise.reject(`Ошибка: ${res.status}`);
-})
+.then(handleResponse)
 }
 
 export function upLoadNewCard(nameValue, urlValue) {
-  return fetch(`${API}wff-cohort-38/cards`, {
+  return fetch(`${API_URL}cards`, {
   method: 'POST',
   headers: {
     authorization: authorizationKey,
@@ -55,29 +49,21 @@ export function upLoadNewCard(nameValue, urlValue) {
     link: urlValue
   })
 })
-.then((res) => {
-  if (res.ok){
-  return res.json();
-  } return Promise.reject(`Ошибка: ${res.status}`);
-})
+.then(handleResponse)
 }
 
 export function cardsLoad() {
-  return fetch (`${API}wff-cohort-38/cards`, {
+  return fetch (`${API_URL}cards`, {
      method: 'GET',
     headers: {
     authorization: authorizationKey
     }
   })
-  .then((res) => {
-    if (res.ok){
-    return res.json();
-    } return Promise.reject(`Ошибка: ${res.status}`);
-  });
+  .then(handleResponse);
 }
 
 export function cardDelete(cardId) {
-  return fetch (`${API}wff-cohort-38/cards/${cardId}`, {
+  return fetch (`${API_URL}cards/${cardId}`, {
     method: 'DELETE',
     headers: {
     authorization: authorizationKey
@@ -86,35 +72,27 @@ export function cardDelete(cardId) {
 }
 
 export function likeCard(cardId) {
-  return fetch (`${API}wff-cohort-38/cards/likes/${cardId}`, {
+  return fetch (`${API_URL}cards/likes/${cardId}`, {
     method: 'PUT',
     headers: {
     authorization: authorizationKey
     }
   })
-  .then((res) => {
-    if (res.ok){
-    return res.json();
-    } return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  .then(handleResponse)
 }
 
 export function unLikeCard(cardId) {
-  return fetch (`${API}wff-cohort-38/cards/likes/${cardId}`, {
+  return fetch (`${API_URL}cards/likes/${cardId}`, {
     method: 'DELETE',
     headers: {
     authorization: authorizationKey
     }
   })
-  .then((res) => {
-    if (res.ok){
-    return res.json();
-    } return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  .then(handleResponse)
 }
 
 export function upLoadNewAvatar(tempUrl) {
-  return fetch(`${API}wff-cohort-38/users/me/avatar`, {
+  return fetch(`${API_URL}users/me/avatar`, {
     method: 'PATCH',
     headers: {
       authorization: authorizationKey,
@@ -124,9 +102,5 @@ export function upLoadNewAvatar(tempUrl) {
       avatar: tempUrl
     })
   })
-  .then((res) => {
-    if (res.ok){
-    return res.json();
-    } return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  .then(handleResponse)
 }

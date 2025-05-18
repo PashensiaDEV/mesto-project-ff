@@ -4,7 +4,6 @@ import { openPopUp, closePopup } from "./modal.js";
 
 import { createCard } from "./card.js";
 import { removeCardFromHtml } from "./card.js";
-import { likeCardChanger } from "./card.js";
 
 import { getCustomerInfo } from "./api.js";
 import { upLoadProfileInfo } from "./api.js";
@@ -27,8 +26,13 @@ export const validationConfig = {
   errorClassDissable: ".form__input-error",
 };
 
-export const API = "https://nomoreparties.co/v1/";
-export const authorizationKey = "4601d008-a405-4f80-81df-1bf2249ca44f";
+const popupDelete = document.querySelector(".popup_type_delete");
+const popupDeleteButton = popupDelete.querySelector(".popup_button-delete");
+
+let currentCardId = null;
+let currentCardElement = null;
+let userId;
+
 
 export const template = document.querySelector("#card-template").content;
 
@@ -42,9 +46,7 @@ const popupAddNewCard = document.querySelector(".popup_type_new-card");
 const formAddNewCard = popupAddNewCard.querySelector('form[name="new-place"]');
 const formEditProfile = popupEditProfile.querySelector('form[name="edit-profile"]');
 const nameInput = popupEditProfile.querySelector(".popup__input_type_name");
-const descriptionInput = popupEditProfile.querySelector(
-  ".popup__input_type_description"
-);
+const descriptionInput = popupEditProfile.querySelector(".popup__input_type_description");
 
 const buttonOpenFormProfile = document.querySelector(".profile__edit-button");
 const buttonOpenFormNewCard = document.querySelector(".profile__add-button");
@@ -76,20 +78,12 @@ function handleAddNewImage(evt) {
   buttonLoad.textContent = tempTextCont;
   upLoadNewCard(inputNameFormNewCard.value, inputLinkFormNewCard.value)
     .then((result) => {
-      const newCard = {
-        name: result.name,
-        link: result.link,
-        likes: result.likes,
-        _id: result._id,
-        owner: {
-          _id: result.owner._id,
-        },
-      };
       const cardElement = createCard(
-        newCard,
-        removeCard,
-        LikeCard,
-        openPopupImage
+        result,
+        handleDeleteCard,
+        likeOnCard,
+        openPopupImage,
+        userId
       );
       templatePush.prepend(cardElement);
       closePopup(popupAddNewCard);
@@ -157,51 +151,28 @@ function openPopupAvatarEdit() {
   });
 }
 
-function removeCard(button, card) {
-  //функция удаления карточки с сервера и с разметки
-  button.addEventListener("click", function () {
-    const listItem = button.closest(".places__item");
-    const popupDelete = document.querySelector(".popup_type_delete ");
-    const popupDeleteButton = popupDelete.querySelector(".popup_button-delete");
-    openPopUp(popupDelete);
-    popupDeleteButton.addEventListener("click", () => {
-      cardDelete(card._id).then(() => {
-        if (listItem) {
-          // Если элемент есть то он будет удален
-          removeCardFromHtml(listItem);
-          closePopup(popupDelete);
-        }
-      });
+function handleDeleteCard(cardId, listItem) {
+  currentCardId = cardId;
+  currentCardElement = listItem;
+  openPopUp(popupDelete);
+}
+
+
+
+function likeOnCard(card, isLiked, onSuccess, onError) {
+  const action = isLiked ? unLikeCard : likeCard;
+
+  action(card._id)
+    .then((updatedCard) => {
+      onSuccess(updatedCard);
+    })
+    .catch((err) => {
+      console.error(`Ошибка при ${isLiked ? "удалении" : "добавлении"} лайка:`, err);
+      if (onError) onError(err);
     });
-  });
 }
 
-// function LikeCard(element) {
-//   element.addEventListener('click', () => {
-//     element.classList.toggle('card__like-button_is-active');
-//   })
-// }
 
-function LikeCard(button, card, likeCounterElement) {
-  button.addEventListener("click", () => {
-    const isLiked = button.classList.contains("card__like-button_is-active");
-
-    const action = isLiked ? unLikeCard : likeCard;
-
-    action(card._id)
-      .then((updatedCard) => {
-        likeCardChanger(button);
-        likeCounterElement.textContent = updatedCard.likes.length;
-        card.likes = updatedCard.likes;
-      })
-      .catch((err) => {
-        console.error(
-          `Ошибка при ${isLiked ? "удалении" : "добавлении"} лайка:`,
-          err
-        );
-      });
-  });
-}
 
 function uploadAvatar(url) {
   const buttonLoad = popupEditAvatar.querySelector('.button');
@@ -212,7 +183,7 @@ function uploadAvatar(url) {
     closePopup(popupEditAvatar);
   })
   .catch((err) => {
-    console.log(err)
+    console.error(err)
   })
   .finally(()=> {
     buttonLoad.textContent = originalTextCont;
@@ -223,16 +194,23 @@ buttonOpenFormProfile.addEventListener("click", openPopupProfile); //Слуша�
 buttonOpenFormNewCard.addEventListener("click", openPopupAddImage); //Слушатель на открытие формы добавления карточки
 imageProfile.addEventListener("click", openPopupAvatarEdit);
 
-// templatePush.addEventListener('click',(event) => { //Здесь мы по делегированию события понимаем куда кликает пользователь
-//   const target = event.target;                  //И перезаписмуем данные изображения в константы и передаем в функцию
-//   if (target.classList.contains('card__image')) {
-//     newCard.link = target.src;
-//     newCard.name = target.alt;
-//     openPopupImage(newCard);
-// }});
+popupDeleteButton.addEventListener("click", () => {
+  if (currentCardId && currentCardElement) {
+    cardDelete(currentCardId)
+      .then(() => {
+        removeCardFromHtml(currentCardElement);
+        closePopup(popupDelete);
+        currentCardId = null;
+        currentCardElement = null;
+      })
+      .catch((err) => {
+        console.error("Ошибка при удалении карточки:", err);
+      });
+  }
+});
+
 
 document.querySelectorAll(".popup").forEach((modal) => {
-  //
   modal.addEventListener("click", (event) => {
     if (
       event.target.classList.contains("popup__close") ||
@@ -256,10 +234,16 @@ enableValidation(validationConfig);
 //_______________________________________________________________________________
 // API
 
-getCustomerInfo();
 
-cardsLoad().then((result) => {
-  result.forEach((card) => {
-    addCards(createCard(card, removeCard, LikeCard, openPopupImage)); // Добавляем все карточки из исходной колекции в разметку
+
+Promise.all([getCustomerInfo(), cardsLoad()])
+.then(([userInfo, cards]) => {
+  console.log(userInfo,cards)
+   userId = userInfo._id;
+    titleProfile.textContent = userInfo.name;
+    descriptionProfile.textContent = userInfo.about;
+    imageProfile.style.backgroundImage = `url(${userInfo.avatar})`
+   cards.forEach((card) => {
+    addCards(createCard(card, handleDeleteCard, likeOnCard, openPopupImage, userId)); // Добавляем все карточки из исходной колекции в разметку
   });
-});
+})
